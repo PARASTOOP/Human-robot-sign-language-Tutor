@@ -11,8 +11,13 @@ This is divided into 3 parts:
 
 The requirements software & libraries for the sign language project are:
 •	Python (3.7.4)
+
 •	IDE (Jupyter)
+
 •	Numpy (version 1.16.5)
+
 •	cv2 (openCV) (version 3.4.2)
+
 •	Keras (version 2.3.1)
+
 •	Tensorflow (as keras uses tensorflow in backend and for image preprocessing) (version 2.0.0)
