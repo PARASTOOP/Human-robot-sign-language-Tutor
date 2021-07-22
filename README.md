@@ -10,6 +10,7 @@ This is divided into 3 parts:
 3.	Predicting the data
 
 The requirements software & libraries for the sign language project are:
+
 •	Python (3.7.4)
 
 •	IDE (Jupyter)
