@@ -10,7 +10,7 @@ This is divided into 3 parts:
 2.	Training a CNN on the captured dataset
 3.	Predicting the data
 
-##The requirements software & libraries for the sign language project are:
+## The requirements software & libraries for the sign language project are:
 
 *	Python (3.7.4)
 
