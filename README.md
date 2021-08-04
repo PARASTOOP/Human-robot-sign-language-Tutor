@@ -29,11 +29,8 @@ This is divided into 3 parts:
 
 ### Background Ellimination Algorithm
 
-I have used opencv for taking a running average of the background for 30 frames and then use that running average to detect the hand that has to be introduced after the background has been properly recognized.
-
-I had found a very useful article on foreground mask by [Gogul09](https://github.com/Gogul09) and i have pretty much used his code for background ellimination with a few changes in order to suit my cause.
-
-He has written an awesome article on the problem and you can read it up [here](https://gogul09.github.io/software/hand-gesture-recognition-p1).
+I used opencv to take a 30-frame running average of the background and then utilised that running average to detect the hand that needed to be inserted after the background was adequately recognised.
+I found this great article on foreground masking by [(https://github.com/Gogul09)], and I pretty much utilised his code for backgrounds removal with a few tweaks to fit my needs. He's written an excellent article on the subject, which you can read here [(https://gogul09.github.io/software/hand-gesture-recognition-p1)].
 
 ### The Deep Convolution Neural Network
 
