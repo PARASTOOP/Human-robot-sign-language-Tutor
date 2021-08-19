@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<package version="1.0.0" uuid="serverbox-a9e402">
+ <names>
+  <name lang="en_US">ServerBox</name>
+ </names>
+ <descriptionLanguages>
+  <language>en_US</language>
+ </descriptionLanguages>
+ <contents>
+  <behaviorContent path="ServerBox">
+   <nature></nature>
+   <permissions/>
+  </behaviorContent>
+ </contents>
+</package>

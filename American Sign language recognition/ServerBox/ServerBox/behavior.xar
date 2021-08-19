@@ -1,0 +1,458 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ChoregrapheProject xmlns="http://www.aldebaran-robotics.com/schema/choregraphe/project.xsd" xar_version="3">
+    <Box name="root" id="-1" localization="8" tooltip="Root box of Choregraphe&apos;s project. Highest level possible." x="0" y="0">
+        <bitmap>media/images/box/root.png</bitmap>
+        <script language="4">
+            <content>
+                <![CDATA[]]>
+</content>
+        </script>
+        <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+        <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+        <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+        <Input name="BehaviorsRun" type="0" type_size="1" nature="4" stm_value_name="BehaviorsRun" inner="1" tooltip="BehaviorsRun desc" id="4" />
+        <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="5" />
+        <Timeline enable="0">
+            <BehaviorLayer name="behavior_layer1">
+                <BehaviorKeyframe name="keyframe1" index="1">
+                    <Diagram>
+                        <Box name="ServerBox" id="1" localization="8" tooltip="Server box that receives JSON messages and execute different actions in the robot. The box start the server according to the following rules:&#x0A;&#x0A;- If &apos;eth0&apos; has a valid IP, the server will listen in its address&#x0A;- If &apos;eth0&apos; is not available and &apos;wlan0&apos; has a valid IP, the server will listen in &apos;wlan0&apos;&#x0A;&#x0A;At the moment the server cannot detect changes in the interfaces. If you switch on the ethernet cable after the robot boot, you need to restart the behaviour (or the robot) to make it able to start to listen" x="494" y="74">
+                            <bitmap>media/images/box/box-script.png</bitmap>
+                            <script language="4">
+                                <content>
+                                    <![CDATA[import SocketServer
+import socket
+import json
+import time
+from naoqi import ALProxy
+
+
+class ServerHandler(SocketServer.BaseRequestHandler):
+    def handle(self):
+        # Receive JSON message
+        buff = self.request.recv(1024)
+        message = json.loads(buff.strip())
+
+        # Decode JSON message
+        message_encoded = json.dumps(message)
+        message_decoded = json.loads(message_encoded)
+        command = message_decoded["command"].lower()
+
+        # Some debug
+        self.server.box.log("Message received:" + repr(buff))
+        # self.server.box.log("Command received:" + repr(command))
+
+        # Response for the client
+        success = True
+        response = {'command': command}
+        information = ''
+
+        if command == 'say':
+            sentence = str(message_decoded['sentence'])
+            attitude = str(message_decoded['attitude'])
+
+            self.server.box.say(sentence, attitude)
+
+            # Response for the client
+            response['result'] = str(success)
+
+        elif command == 'set':
+            parameter = str(message_decoded['parameter'])
+            value = str(message_decoded['value'])
+            if parameter == 'volume':
+                success = self.server.box.setVolume(float(value))
+
+            elif parameter == 'behaviour':
+                success = self.server.box.setBehaviour(value)
+
+            elif parameter == 'stiffness':
+                success = self.server.box.setStiffness(value)
+
+            elif parameter == 'language':
+                success = self.server.box.setLanguage(value)
+
+            # Response for the client
+            response['result'] = str(success)
+
+        elif command == 'get':
+            parameter = str(message_decoded['parameter'])
+
+            if parameter == 'volume':
+                information = self.server.box.getVolume()
+
+            if parameter == 'running_behaviours':
+                behaviours = self.server.box.getRunningBehavioursList()
+                information = ';'.join(behaviours)
+
+            if parameter == 'available_behaviours':
+                behaviours = self.server.box.getAvailableBehavioursList()
+                information = ';'.join(behaviours)
+
+            if parameter == 'available_languages':
+                languages = self.server.box.getAvailableLanguages()
+                information = ';'.join(languages)
+
+            if parameter == 'current_language':
+                information = self.server.box.getLanguage()
+
+            if parameter == 'available_attitudes':
+                information = self.server.box.getAttitudes()
+
+            if parameter == 'battery':
+                information = self.server.box.getBatteryLevel()
+
+            response['information'] = information
+            response['parameter'] = parameter
+
+        elif command == 'stop':
+            behaviour = str(message_decoded['behaviour'])
+
+            if behaviour == 'all':
+                # Stop all possible behaviours
+                self.server.box.stopAllBehaviours()
+            else:
+                # Stop the specified behaviour
+                self.server.box.stopBehaviour(behaviour)
+
+        # Send response
+        json_response = json.dumps(response)
+
+        self.server.box.log('Response: ' + repr(json_response))
+        self.request.sendall(json_response)
+
+
+class Utils:
+    """
+    Portable class with some useful methods
+    """
+    def __init__(self):
+        pass
+
+    def getRobotIp(self):
+        """
+        Return a dictionary with the IP address of the active robot interfaces
+        """
+
+        # This should be a portable class, so, just to be sure the module
+        # has been imported
+        from naoqi import ALProxy
+        proxy = ALProxy('ALConnectionManager')
+
+        interfaces = {}
+        for service in proxy.services():
+            network = dict(service)
+
+            # Only id the interface is connected (or 'ready')
+            if network['State'] == 'online' or \
+               network['State'] == 'ready':
+
+                # 'ServiceId' has a string like 'ethernet_xxx' or 'wifi_xxx'
+                service_id = network['ServiceId']
+
+                # IPv4 address
+                address = dict(network['IPv4'])['Address']
+
+                # Fill the interfaces dictionary
+                if 'ethernet' in service_id:
+                    interfaces['eth0'] = address
+                elif 'wifi' in service_id:
+                    interfaces['wlan0'] = address
+
+        return interfaces
+
+
+class MyClass(GeneratedClass):
+    """
+    Server box that receives JSON messages and execute different actions
+    in the robot. The box start the server according to the following rules:
+
+    - If 'eth0' has a valid IP, the server will listen in its address
+    - If 'eth0' is not available and 'wlan0' has a valid IP, the server will
+    listen in 'wlan0'
+
+    At the moment the server cannot detect changes in the interfaces. If you
+    switch on the ethernet cable after the robot boot, you need to restart
+    the behaviour (or the robot) to make it able to start to listen
+    """
+    def __init__(self):
+        GeneratedClass.__init__(self)
+        self.last_started_behaviour = None
+
+    def onLoad(self):
+        # The box has an integer parameter called "Port"
+        self.port = self.getParameter("Port")
+
+        # We get the IP from the system
+        utils = Utils()
+        self.ip = None
+        tries = 0
+        while self.ip == None and tries < 10:
+            # Keep active the Behaviour till a connection
+            # is available
+            interfaces = utils.getRobotIp()
+
+            # Is ethernet connected?
+            if 'eth0' in interfaces:
+                self.ip = interfaces['eth0']
+            elif 'wlan0' in interfaces:
+                self.ip = interfaces['wlan0']
+            else:
+                self.ip = None
+                # Sleep 2 seconds
+                tries += 1
+                time.sleep(2)
+
+        self.log("IP found: " + self.ip)
+
+        # Flag to stop the server
+        self.server_listening = True
+
+        # Server
+        self.server = None
+
+    def onUnload(self):
+        #self.server_running = False
+        # Stop the server
+        self.stop_server()
+
+    def onInput_onStart(self):
+        self.start_server()
+
+        # Say the next box that this box has finished
+        self.onStopped()
+
+    def onInput_onStop(self):
+        # it is recommended to call onUnload of this box in a onStop method,
+        # as the code written in onUnload is used to stop the box as well
+        self.stop_server()
+        #self.onUnload()
+
+    def onInput_RunningBehaviours(self, running_behaviours):
+        if self.last_started_behaviour is None:
+            return
+
+        if self.last_started_behaviour in running_behaviours:
+            pass
+        else:
+            self.last_started_behaviour = None
+            self.behaviour_finished()
+
+    def stopAllBehaviours(self):
+        """ Stop all behaviours except the default behaviour and this Server"""
+        proxy = ALProxy("ALBehaviorManager")
+
+        for behaviour in proxy.getRunningBehaviors():
+            if not behaviour in '.currentChoregrapheBehavior' \
+                and not behaviour in 'ServerBox':
+                proxy.stopBehavior(behaviour)
+
+    def stopBehaviour(self, behaviour):
+        """Stop the specified behaviour, even the ServerBox behaviour"""
+        proxy = ALProxy("ALBehaviorManager")
+
+        if behaviour in proxy.getRunningBehaviors():
+            proxy.stopBehavior(behaviour)
+
+    def setVolume(self, volume):
+        proxy = ALProxy("ALTextToSpeech")
+
+        if volume < 0.0 or volume > 1.0:
+            return False
+
+        self.log("Setting volume:" + str(volume))
+        proxy.setVolume(volume)
+
+        return True
+
+    def setBehaviour(self, behaviour):
+        proxy = ALProxy("ALBehaviorManager")
+
+        # If the behaviour is not installed, return False
+        if not proxy.isBehaviorInstalled(behaviour):
+            return False
+
+        # Stimulate starting_behaviour output
+        self.starting_behaviour()
+
+        # Stop the behaviour.
+        if (proxy.isBehaviorRunning(behaviour)):
+            proxy.stopBehavior(behaviour)
+
+        # Set NAO in Stiffness On
+        self.setStiffness('on')
+
+        # Run the Behaviour
+        proxy.post.runBehavior(behaviour)
+        self.last_started_behaviour = behaviour
+        self.log("Starting Behaviour:" + behaviour)
+
+        return True
+
+    def setStiffness(self, action):
+        proxy = ALProxy("ALMotion")
+
+        # Check the robot is not moving
+        while proxy.moveIsActive():
+            time.sleep(0.1)
+
+        # We use the "Body" name to signify the collection of all joints
+        pNames = "Body"
+        action = action.lower()
+        pStiffnessLists = 1.0 if action == 'on' else 0.0
+        pTimeLists = 1.0
+
+        while proxy.moveIsActive():
+            time.sleep(0.1)
+
+        self.log("Setting stiffness:" + action)
+        proxy.stiffnessInterpolation(pNames, pStiffnessLists, pTimeLists)
+        return True
+
+    def setLanguage(self, language):
+        proxy = ALProxy("ALSpeechRecognition")
+        proxy.setLanguage(language)
+
+        proxy = ALProxy("ALTextToSpeech")
+        proxy.setLanguage(language)
+
+        return True
+
+    def say(self, sentence, attitude = ''):
+        proxy = ALProxy("ALTextToSpeech")
+
+        # The sentence is separated by dots, inserting a pause and reducing the speed
+        for s in sentence.split('.'):
+            s = '\\rspd=85\\' + s
+            s = s.replace(',', ',\\pau=300\\')
+            if attitude:
+                self.setBehaviour(attitude)
+
+            # Small delay to give time to the behaviour to start
+            time.sleep(0.4)
+            self.log("Speaking:" + s)
+            proxy.say(s)
+            self.log("Speaking finished")
+
+        # Add a pause after every dot, every pause and make the speech slower
+#        sentence = '\\rspd=85\\' + sentence
+#        sentence = sentence.replace('.', '.\\pau=500\\').replace(',', ',\\pau=300\\')
+#        self.log("Speaking:" + sentence)
+#        proxy = ALProxy("ALTextToSpeech")
+
+        # Small delay to give time to the behaviour to start
+#        time.sleep(1)
+#        proxy.say(sentence)
+#        self.log("Speaking finished")
+
+        return True
+
+    def getBatteryLevel(self):
+        """
+        Return the battery level, string between 0 and 1
+        """
+        proxy = ALProxy("ALMemory")
+
+        return u'%.2f' % proxy.getData('Device/SubDeviceList/Battery/Charge/Sensor/Value')
+
+    def getVolume(self):
+        proxy = ALProxy("ALTextToSpeech")
+
+        return u'%.2f' % proxy.getVolume()
+
+    def getRunningBehavioursList(self):
+        proxy = ALProxy("ALBehaviorManager")
+
+        behaviours = proxy.getRunningBehaviors()()
+
+        if '.currentChoregrapheBehavior' in behaviours:
+            behaviours.remove('.currentChoregrapheBehavior')
+
+        return behaviours
+
+    def getAvailableBehavioursList(self):
+        """ Return a list of available behaviours. The list does not include
+        the default behaviour"""
+        proxy = ALProxy("ALBehaviorManager")
+
+        behaviours = proxy.getInstalledBehaviors()
+
+        if '.currentChoregrapheBehavior' in behaviours:
+            behaviours.remove('.currentChoregrapheBehavior')
+
+        if 'ServerBox' in behaviours:
+            behaviours.remove('ServerBox')
+
+        return behaviours
+
+    def getAvailableLanguages(self):
+        """ Return a list of available languages"""
+        proxy = ALProxy("ALSpeechRecognition")
+
+        return proxy.getAvailableLanguages()
+
+    def getLanguage(self):
+        """ Return a list of available languages"""
+        proxy = ALProxy("ALSpeechRecognition")
+
+        return proxy.getLanguage()
+
+    def getAttitudes(self):
+        # TODO
+        # Set a specific tag or prefix for installed behaviours that represent
+        # attitudes. Just return this behaviours
+        return ['Happy', 'Sad', 'Neutral']
+
+    def start_server(self):
+        # No IP?, return
+        if self.ip is None:
+            return
+
+        # Some debug information
+        self.log("Starting server in:" + self.ip + ":" + repr(self.port))
+
+        # Create the server and start to listen
+        SocketServer.TCPServer.allow_reuse_address = True
+        self.server = SocketServer.TCPServer((self.ip, self.port), ServerHandler)
+
+        # We set the address to be reused. This is useful if we restart the box
+        self.server.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+        # Set the box in the server, used to call server methods
+        self.server.box = self
+
+        # Start serving. This loop ends when the 'server.shutdown()' is called
+        self.server.serve_forever()
+
+    def stop_server(self):
+        # Some debug information
+        self.log("Stopping server in:" + self.ip + ":" + repr(self.port))
+        if self.server is not None:
+
+            # Stop the server loop
+            self.server.shutdown()
+
+            # Just, to be sure the socket has been closed (for reuse case)
+            self.server.server_close()
+
+            # Some more debug information
+            self.log("Server stopped")]]>
+</content>
+                            </script>
+                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                            <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                            <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+                            <Input name="RunningBehaviours" type="3" type_size="1" nature="1" inner="0" tooltip="Receive a list with the running behaviours" id="4" />
+                            <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="5" />
+                            <Output name="starting_behaviour" type="1" type_size="1" nature="2" inner="0" tooltip="" id="6" />
+                            <Output name="behaviour_finished" type="1" type_size="1" nature="2" inner="0" tooltip="" id="7" />
+                            <Parameter name="Port" inherits_from_parent="0" content_type="1" value="12345" default_value="12345" min="1024" max="60000" tooltip="" id="8" />
+                        </Box>
+                        <Link inputowner="1" indexofinput="2" outputowner="0" indexofoutput="2" />
+                        <Link inputowner="0" indexofinput="5" outputowner="1" indexofoutput="5" />
+                        <Link inputowner="1" indexofinput="4" outputowner="0" indexofoutput="4" />
+                    </Diagram>
+                </BehaviorKeyframe>
+            </BehaviorLayer>
+        </Timeline>
+    </Box>
+</ChoregrapheProject>
