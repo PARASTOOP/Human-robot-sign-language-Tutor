@@ -57,7 +57,7 @@ The ratio of training set to validation set is **1000 : 100**.
 ## How to run the RealTime prediction
 
 
-![Final view of the program interface](https://your-copied-image-address)
+![Final view of the program interface](https://github.com/PARASTOOP/Human-robot-sign-language-Tutor/blob/main/project%20screenshot/full%20screen%20GU%20gesture%20recognition.PNG)
 
 ## Demo of how things look on the go
 
