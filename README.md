@@ -39,8 +39,6 @@ This app is compatible with NAO V6, and Naoqi 2.8.6
 
 ## Some key architectural insights into the project
 
-### Background Ellimination Algorithm
-
 I used opencv to take a frame running average of the background and then utilised that running average to detect the hand that needed to be inserted after the background was adequately recognised.
 I found this great article on foreground masking by [(https://github.com/Gogul09)], and I pretty much utilised his code for backgrounds removal with a few tweaks to fit my needs. He's written an excellent article on the subject, which you can read here [(https://gogul09.github.io/software/hand-gesture-recognition-p1)].
 
@@ -55,7 +53,6 @@ It needs to be run with model_edged.h5 the SignLanguageRrecogniser.py i
 
 ![Final view of the program interface](https://github.com/PARASTOOP/Human-robot-sign-language-Tutor/blob/main/project%20screenshot/full%20screen%20GU%20gesture%20recognition.PNG)
 
-## Demo of how things look on the go
 
 Well now it's time for some demo.
 
