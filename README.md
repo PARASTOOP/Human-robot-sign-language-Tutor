@@ -54,8 +54,11 @@ It needs to be run with model_edged.h5 the SignLanguageRrecogniser.py i
 ![Final view of the program interface](https://github.com/PARASTOOP/Human-robot-sign-language-Tutor/blob/main/project%20screenshot/full%20screen%20GU%20gesture%20recognition.PNG)
 
 
-Well now it's time for some demo.
+Well now it's time for some demo.Watch "Dewey The Humanoid Robot  designed to be a Sign Language tutor." on YouTube
 
 ![demo of the Robot syestem](https://youtu.be/jrCVKKwnMdw)
-Watch "Dewey The Humanoid Robot  designed to be a Sign Language tutor." on YouTube
-(https://youtu.be/Y_03hPUITBY)
+
+
+
+![Watch "Utelising Humanoid Robot As A sign language tutor" on YouTube](https://youtu.be/Y_03hPUITBY)
+
