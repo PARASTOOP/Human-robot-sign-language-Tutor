@@ -32,6 +32,8 @@ This is divided into 3 parts:
 
 *	Tensorflow (as keras uses tensorflow in backend and for image preprocessing) (version 2.0.0)
 *	1. Hardware & software compatibility
+*	For American gesutre recognition Nao Application.
+*	choregraphe-version-2.8.6.23-win64 
 This app is compatible with NAO V6, and Naoqi 2.8.6
 
 
@@ -39,23 +41,17 @@ This app is compatible with NAO V6, and Naoqi 2.8.6
 
 ### Background Ellimination Algorithm
 
-I used opencv to take a 30-frame running average of the background and then utilised that running average to detect the hand that needed to be inserted after the background was adequately recognised.
+I used opencv to take a frame running average of the background and then utilised that running average to detect the hand that needed to be inserted after the background was adequately recognised.
 I found this great article on foreground masking by [(https://github.com/Gogul09)], and I pretty much utilised his code for backgrounds removal with a few tweaks to fit my needs. He's written an excellent article on the subject, which you can read here [(https://gogul09.github.io/software/hand-gesture-recognition-p1)].
 
 ### The Deep Convolution Neural Network
 
-The network contains **7** hidden convolution layers with **Relu** as the activation function and **1** Fully connected layer.
-
-The network is trained across **50** iterations with a batch size of **64**.
-
-I kind of saw that 50 iterations kind of trains the model well and there is no increase in validation accuracy along the lines so that should be enough.
-
-The model achieves an accuracy of **96.6%** on the validation dataset.
+The model achieves an accuracy of **100%** on the validation dataset.
 
 The ratio of training set to validation set is **1000 : 100**.
 
 ## How to run the RealTime prediction
-
+It needs to be run with model_edged.h5 the SignLanguageRrecogniser.py i
 
 ![Final view of the program interface](https://github.com/PARASTOOP/Human-robot-sign-language-Tutor/blob/main/project%20screenshot/full%20screen%20GU%20gesture%20recognition.PNG)
 
