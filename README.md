@@ -56,9 +56,10 @@ It needs to be run with model_edged.h5 the SignLanguageRrecogniser.py i
 
 Well now it's time for some demo.Watch "Dewey The Humanoid Robot  designed to be a Sign Language tutor." on YouTube
 
-![demo of the Robot syestem](https://youtu.be/jrCVKKwnMdw)
+![demo of the Robot syestem (https://youtu.be/jrCVKKwnMdw)]
 
 
 
-![Watch "Utelising Humanoid Robot As A sign language tutor" on YouTube](https://youtu.be/Y_03hPUITBY)
+![Watch "Utelising Humanoid Robot As A sign language tutor" on YouTube]
+[(https://youtu.be/Y_03hPUITBY)]
 
