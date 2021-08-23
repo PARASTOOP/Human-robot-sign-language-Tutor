@@ -1,4 +1,13 @@
+
+[### demo of the Robot syestem (https://youtu.be/MhErSqlJOnY)]
+
+
+[### Watch Final presentation of developing "Utelising Humanoid Robot As A sign language tutor" on YouTube]
+[(https://youtu.be/Y_03hPUITBY)]
+
+
 # Human-robot-sign-language-Tutor
+
 
 This application demonstrate how the NAO robot can recognize ASL(American alphabet signs) using deep learning algorithms and machin learning. It comes with a pre-trained deep learning model that allows NAO to recognize 26  different American alphabet signs with its camera.
 
@@ -20,12 +29,7 @@ This is divided into 3 parts:
 
 Well now it's time for some demo.Watch "Dewey The Humanoid Robot  designed to be a Sign Language tutor." on YouTube
 
-![demo of the Robot syestem (https://youtu.be/MhErSqlJOnY)]
 
-
-
-![Watch Final presentation of developing "Utelising Humanoid Robot As A sign language tutor" on YouTube]
-[(https://youtu.be/Y_03hPUITBY)]
 
 ## The requirements software & libraries for the sign language project are:
 
