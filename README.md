@@ -2,10 +2,6 @@
 
 This application demonstrate how the NAO robot can recognize ASL(American alphabet signs) using deep learning algorithms and machin learning. It comes with a pre-trained deep learning model that allows NAO to recognize 26  different American alphabet signs with its camera.
 
-
-To implant our model we borrowed SoftBank Object recognition on NAO with Deep Learning application screepts and sourse code ,manipuleted code to create our own application.
-The original application and trained the model on google colab IDE based on Tiny YOLOv4.
-
 We traind our own deep learning model with ASL image dataset and uploaded the model to be used in this application.
 
 ## About the Project
