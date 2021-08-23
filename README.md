@@ -3,8 +3,8 @@
 This application demonstrate how the NAO robot can recognize ASL(American alphabet signs) using deep learning algorithms and machin learning. It comes with a pre-trained deep learning model that allows NAO to recognize 26  different American alphabet signs with its camera.
 
 
-To implant our model we borrowed SoftBank Object recognition on NAO with Deep Learning application screepts and sourse code ,manipuleted code to create our own application.
-The original application and trained the model on google colab IDE based on Tiny YOLOv4.
+To implant our model we borrowed  Dataset from MINIST American Alphabet dataset from Kaggle [(https://github.com/kaggledatasets/kaggledatasets#from-source)].
+The original application and trained the model on Jupytre Notebook IDE based on OpenCV.
 
 We traind our own deep learning model with ASL image dataset and uploaded the model to be used in this application.
 
@@ -14,8 +14,8 @@ We traind our own deep learning model with ASL image dataset and uploaded the mo
 
 This project designed in two steps, first step is sign language recognition were we create a sign detector, which detects the alphabets that can very easily be extended to cover a vast multitude of other signs and hand gestures including the numbers from 1 to 10.
 This is divided into 3 parts:
-1.	Creating the dataset
-2.	Training a CNN on the captured dataset
+1.	pretrained the dataset
+2.	Training a CNN model on the captured dataset
 3.	Predicting the data
 
 ## The requirements software & libraries for the sign language project are:
@@ -45,8 +45,6 @@ I found this great article on foreground masking by [(https://github.com/Gogul09
 ### The Deep Convolution Neural Network
 
 The model achieves an accuracy of **100%** on the validation dataset.
-
-The ratio of training set to validation set is **1000 : 100**.
 
 ## How to run the RealTime prediction
 It needs to be run with model_edged.h5 the SignLanguageRrecogniser.py i
